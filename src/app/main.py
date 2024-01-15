@@ -1,11 +1,27 @@
 from typing import Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
+from sqlalchemy.orm import Session
+
+from . import models
+
+from .database import  engine, SessionLocal
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 class Post(BaseModel):
     title: str
@@ -26,3 +42,8 @@ def read_item(item_id: int, q: Union[str, None] = None):
 def createPost(post: Post):
     print(post)
     return {'message':'Successfully added the comment'}
+
+
+# @app.get("/sqlalchemy")
+# def testPost(db:Session = Depends(get_db)):
+#     return {"status": "Success"}

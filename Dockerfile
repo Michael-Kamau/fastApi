@@ -14,13 +14,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8000
 
 # Define environment variable
-ENV POSTGRES_DB=mydatabase
+ENV POSTGRES_DB=fastapi_db
 ENV POSTGRES_USER=myuser
 ENV POSTGRES_PASSWORD=mypassword
 ENV POSTGRES_HOST=db
 
 # Set the working directory to the location of the main.py file
-WORKDIR /app/src/app
+# WORKDIR /app/src/app
 
 # Run app.py when the container launches
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
