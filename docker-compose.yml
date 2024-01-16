@@ -11,7 +11,8 @@ services:
     depends_on:
       - db
     env_file: .env  # Specify the path to your .env file
-
+    volumes:
+      - .:/app
   db:
     image: postgres:13.2
     container_name: postgres
