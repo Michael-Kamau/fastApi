@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import FastAPI, Depends, status, HTTPException
+from fastapi import FastAPI, Depends, status, HTTPException, Response
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
@@ -52,6 +52,33 @@ def createPost(post: Post, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_post)
     return {'message':'Successfully added the post', 'data':new_post}
+
+@app.delete('/posts/{id}')
+def delete_post(id:int, db:Session=Depends(get_db)):
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'The post with an id of {id} cannot be deleted')
+    
+    post.delete(synchronize_session = False)
+    db.commit()
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@app.put('/posts/{id}')
+def update_post(id:int, updated_post:Post, db:Session=Depends(get_db)):
+    post_query= db.query(models.Post).filter(models.Post.id == id)
+
+    post = post_query.first()
+
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    post_query.update(updated_post.dict(), synchronize_session = False)
+
+    db.commit()
+
+    return {'data': post_query.first()}
 
 
 @app.get("/sqlalchemy")
